@@ -34,6 +34,14 @@ Built for the [Nebius Serverless AI Builders Challenge](https://nebius.com/serve
 
 ![Resilience heatmap (published run)](results/full/heatmap.png)
 
+| Topology | none | crash | byzantine |
+|---|---|---|---|
+| flat | 96% | **100%** | **100%** |
+| hierarchical | 100% | **80%** | 92% |
+| ring | 96% | 92% | **88%** |
+
+*(n=25 per cell; full per-cell data in [`results/full/summary.md`](results/full/summary.md).)*
+
 Forensic detail worth the click: in hierarchical/crash, **all five losses — and only those five — were aggregator deaths** (SPOF loss predicted 20%, measured 20%), and flat's immunity costs **2.8× the tokens per trial**. Companion charts from the same run: [latency under fault](results/full/latency_under_fault.png) (where a *faster* mesh turns out to be a *failing* mesh) · [the price of resilience](results/full/price_of_resilience.png).
 
 **Stability check** ([`results/stability_check/`](results/stability_check/)): a second, independent 225-trial run with the hardened verdict parser. Individual cells move by ±1 trial (that's n=25 sampling), but the invariant reproduces exactly — **10 aggregator deaths across the two runs, 10 total losses**, and every hierarchical failure in both runs went through the root, dead or lying. The second run also surfaced a quorum lesson the first missed: one flat/crash trial ended in a **2–2 tie**, because crashing one of five agents doesn't just remove a voter — it removes *oddness*. And across both runs, faulted meshes almost never decide *wrong*; they fail to decide at all — except under byzantine, where the failures are confidently wrong.
