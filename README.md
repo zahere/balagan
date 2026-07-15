@@ -127,15 +127,17 @@ Then cancel the job mid-sweep (`nebius ai job delete <JOB_ID>`), resubmit, and w
 
 | Piece | Platform / preset | Runtime | Approx. cost |
 |---|---|---|---|
-| Endpoint (vLLM, 7B) | `gpu-l40s-a` / `1gpu-8vcpu-32gb` | ~7 min cold start, then live during sweeps | TODO |
-| Job — `demo` (72 trials) | `cpu-d3` / `4vcpu-16gb` | 31 s sweep (~2 min job incl. image pull) | TODO |
-| Job — `full` (225 trials) | `cpu-d3` / `4vcpu-16gb` | 63 s sweep (~2.5 min job incl. image pull) | TODO |
+| Endpoint (vLLM, 7B) | `gpu-l40s-a` / `1gpu-8vcpu-32gb` | ~7 min cold start, then live during sweeps | ~$1.55/GPU-h all-in |
+| Job — `demo` (72 trials) | `cpu-d3` / `4vcpu-16gb` | 31 s sweep (~2 min job incl. image pull) | <$0.01 |
+| Job — `full` (225 trials) | `cpu-d3` / `4vcpu-16gb` | 63 s sweep (~2.5 min job incl. image pull) | ~$0.01 |
 | Mock mode | your laptop | <5 s | $0 |
 
 The sweep job is **CPU-only** — all GPU cost is the endpoint, billed only while
-it's up. That split is the whole reason serverless fits this workload.
-
-<!-- TODO: fill measured numbers from the real runs + console screenshots in docs/ -->
+it's up. That split is the whole reason serverless fits this workload. Measured
+bill for everything in this repo — both full sweeps, demo, smoke, and several
+kill-and-recover demos: **$3.64** at the billing snapshot (endpoint $3.50, all
+CPU jobs $0.04, Object Storage <$0.01). Full detail:
+[`results/full/2026-07-15-l40s.md`](results/full/2026-07-15-l40s.md).
 
 ## Expected output
 
