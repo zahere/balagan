@@ -12,3 +12,4 @@ build/
 # Written by nebius/1_deploy_endpoint.sh — contains the endpoint auth token
 nebius/endpoint.env
 .DS_Store
+!results/stability_check/
