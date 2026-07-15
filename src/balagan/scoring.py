@@ -4,7 +4,12 @@ from __future__ import annotations
 
 import re
 
-_VERDICT_RE = re.compile(r"VERDICT:\s*(TRUE|FALSE)", re.IGNORECASE)
+# Tolerates the decoration real models emit around the token we asked for:
+#   "VERDICT: TRUE" · "**VERDICT: FALSE**" · "**VERDICT:** TRUE" · "verdict - true."
+# Root cause of the v0.1 full-run parse misses: markdown bold around the verdict.
+_VERDICT_RE = re.compile(
+    r"VERDICT[\*_`]*\s*[:\-\u2013]?\s*[\*_`\"']*\s*(TRUE|FALSE)", re.IGNORECASE
+)
 
 
 def parse_verdict(text: str | None) -> bool | None:

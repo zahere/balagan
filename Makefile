@@ -19,3 +19,7 @@ kill:              ## The chaos demo: cancel the running job, then `make full` t
 
 test:              ## Regression tests (incl. S3 resume via moto)
 	python3 -m pytest tests/ -q
+
+lg-mock:           ## LangGraph adapter pipeline, offline (requires: pip install -e ".[langgraph]")
+	balagan run --config configs/langgraph-demo.yaml --mock
+	balagan report --config configs/langgraph-demo.yaml

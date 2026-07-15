@@ -58,6 +58,14 @@ async def run_sweep(cfg: Config, mock: bool = False, limit: int | None = None) -
     if limit:
         trials = trials[:limit]
 
+    if any(str(t).startswith("lg-") for t in cfg.topologies):
+        try:
+            from balagan import adapters  # noqa: F401 — registers lg-* protocols
+        except ImportError as err:
+            raise SystemExit(
+                "lg-* topologies need the LangGraph extra: pip install 'balagan[langgraph]'"
+            ) from err
+
     store = make_store(cfg)
     done = store.done()
     todo = [t for t in trials if t.id not in done]

@@ -1,0 +1,27 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install (core + langgraph + dev)
+        run: pip install -e ".[langgraph,dev]"
+      - name: Unit + resume regression tests
+        run: python -m pytest tests/ -q
+      - name: Full pipeline, offline (mock)
+        run: |
+          balagan run --config configs/demo.yaml --mock
+          balagan report --config configs/demo.yaml
+      - name: LangGraph adapter pipeline, offline (mock)
+        run: |
+          balagan run --config configs/langgraph-demo.yaml --mock
+          balagan report --config configs/langgraph-demo.yaml

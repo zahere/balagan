@@ -19,6 +19,7 @@ difficulty: intermediate
 
 # Balagan 🎪
 
+[![ci](https://github.com/zahere/balagan/actions/workflows/ci.yml/badge.svg)](https://github.com/zahere/balagan/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 [![Runs on Nebius Serverless](https://img.shields.io/badge/runs%20on-Nebius%20Serverless-8b5cf6.svg)](https://docs.nebius.com/serverless/overview)
@@ -32,6 +33,8 @@ Built for the [Nebius Serverless AI Builders Challenge](https://nebius.com/serve
 **The published sweep** (225 trials, Qwen2.5-7B-Instruct on a Nebius Serverless Endpoint, zero trial errors): flat/majority held 100% under both fault models; hierarchical dropped to **80% under crash** — exactly the structural prediction, since a uniform victim kills the aggregator in 1 of 5 trials and an undecided mesh scores as wrong; ring was weakest under byzantine (**88%**), where one late-chain saboteur owns the final verdict.
 
 ![Resilience heatmap (published run)](results/full/heatmap.png)
+
+Forensic detail worth the click: in hierarchical/crash, **all five losses — and only those five — were aggregator deaths** (SPOF loss predicted 20%, measured 20%), and flat's immunity costs **2.8× the tokens per trial**. Companion charts from the same run: [latency under fault](results/full/latency_under_fault.png) (where a *faster* mesh turns out to be a *failing* mesh) · [the price of resilience](results/full/price_of_resilience.png).
 
 *(A mock-mode sample lives in `results/sample_mock/` — that one validates the pipeline, not the finding.)*
 
@@ -144,6 +147,12 @@ results/demo/
 └── heatmap.png             # the resilience heatmap
 ```
 
+Real-endpoint runs additionally emit `latency_under_fault.png` (per-cell trial
+latency — where you learn that a *faster* mesh may be a *failing* mesh) and
+`price_of_resilience.png` (tokens/trial vs worst-case accuracy). All charts
+regenerate offline from the committed `results/full/results.jsonl` via
+`balagan report --config configs/full.yaml` — no bucket or endpoint needed.
+
 On a real endpoint run, the job logs show the resume header, per-10-trial progress
 lines, and a completion line — see the sample in `nebius/RUNBOOK.md` step 6.
 
@@ -157,6 +166,24 @@ lines, and a completion line — see the sample in `nebius/RUNBOOK.md` step 6.
   keep the fault-free baseline near ceiling or fault effects get confounded.
 - **Preemptible capacity:** `PREEMPTIBLE=true ./nebius/2_run_job.sh` — safe by
   construction, since a preempted job resumes exactly like a cancelled one.
+
+## Chaos-testing a LangGraph mesh
+
+The fault models inject at the *agent* level, so the harness doesn't care how
+the mesh is wired. `pip install -e ".[langgraph]"` and the same three shapes run
+as **compiled LangGraph `StateGraph`s** — parallel fan-out/fan-in supersteps,
+reducer-merged state, one graph per trial — with Balagan's client, faults, and
+scoring unchanged (`src/balagan/adapters/langgraph_mesh.py`):
+
+```bash
+balagan run --config configs/langgraph-demo.yaml --mock   # offline, $0
+balagan report --config configs/langgraph-demo.yaml
+```
+
+If you run agents in production, you already live in one of these rows:
+supervisor/orchestrator patterns → `lg-hierarchical` · sequential chains →
+`lg-ring` · debate/swarm-with-vote → `lg-flat`. Adapters for other frameworks
+are the v0.2 headline — the plugin surface is one async function.
 
 ## Troubleshooting
 
