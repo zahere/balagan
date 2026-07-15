@@ -1,0 +1,30 @@
+# Demo profile — what a judge or reader runs first.
+# 72 trials. Expect roughly 15-20 min end-to-end against a 7B vLLM endpoint.
+run_name: demo
+
+model: Qwen/Qwen2.5-7B-Instruct
+endpoint_env: NEBIUS_ENDPOINT_URL     # http://<endpoint-ip>/v1
+api_key_env: NEBIUS_API_KEY           # the endpoint's --token value
+
+n_agents: 5
+topologies: [flat, hierarchical, ring]
+faults: [none, crash, byzantine]
+trials_per_cell: 8
+
+claim_generators: [arith_sum, arith_product, compare]
+claims_file: data/claims_demo.jsonl
+
+# Checkpoint store. On Nebius these come from --env (S3_BUCKET, S3_PREFIX,
+# S3_ENDPOINT_URL, AWS_*). Left blank => local disk, which is fine on a laptop
+# but WILL lose your checkpoint when a Serverless Job VM is released.
+s3_bucket: ""
+s3_prefix: balagan
+s3_endpoint_url: ""                   # https://storage.eu-north1.nebius.cloud:443
+s3_region: ""                         # eu-north1
+results_dir: results
+
+concurrency: 8
+seed: 7
+temperature: 0.0
+max_tokens: 220
+max_retries: 4

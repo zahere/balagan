@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "balagan"
+version = "0.1.0"
+description = "Balagan — chaos engineering harness for multi-agent LLM meshes"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Zaher Khateeb" }]
+dependencies = [
+  "openai==1.54.4",
+  "httpx==0.27.2",
+  "pyyaml==6.0.2",
+  "matplotlib==3.9.2",
+  "boto3==1.35.76",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==8.3.4",
+  "moto[s3]==5.0.22",
+]
+
+[project.scripts]
+balagan = "balagan.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

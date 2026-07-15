@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.env
+.venv/
+results/*
+!results/sample_mock/
+!results/full/
+dist/
+build/
+
+# Written by nebius/1_deploy_endpoint.sh — contains the endpoint auth token
+nebius/endpoint.env
+.DS_Store
